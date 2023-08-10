@@ -5,33 +5,24 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
+import React, {useEffect} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
+  TouchableOpacity,
   View,
-  TouchableOpacity
+  useColorScheme,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
-import type { RootState } from './store'
-import { useSelector, useDispatch } from 'react-redux'
-import { decrement, increment } from './reducers'
+import {useDispatch, useSelector} from 'react-redux';
+import {decrement, increment} from './reducers';
+import type {RootState} from './store';
 // import LoginScreen from './app/components/LoginScreen';
-import LoginScreen from './app/components/ConversionScreen/index1';
-import {SafeAreaProvider} from "react-native-safe-area-context";
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import LoginScreen from './app/index';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -64,32 +55,26 @@ function Section({children, title}: SectionProps): JSX.Element {
 }
 
 export function Counter() {
-  const count = useSelector((state: RootState) => state.counter.value)
-  const dispatch = useDispatch()
+  const count = useSelector((state: RootState) => state.counter.value);
+  const dispatch = useDispatch();
 
   return (
+    <View>
       <View>
-        <View>
-          <TouchableOpacity
-              aria-label="Increment value"
-              onPress={() => dispatch(increment())}
-          >
-            <Text>
-              Increment
-            </Text>
-          </TouchableOpacity>
-          <Text>{count}</Text>
-          <TouchableOpacity
-              aria-label="Decrement value"
-              onPress={() => dispatch(decrement())}
-          >
-            <Text>
-              Decrement
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          aria-label="Increment value"
+          onPress={() => dispatch(increment())}>
+          <Text>Increment</Text>
+        </TouchableOpacity>
+        <Text>{count}</Text>
+        <TouchableOpacity
+          aria-label="Decrement value"
+          onPress={() => dispatch(decrement())}>
+          <Text>Decrement</Text>
+        </TouchableOpacity>
       </View>
-  )
+    </View>
+  );
 }
 
 function App(): JSX.Element {
@@ -104,9 +89,9 @@ function App(): JSX.Element {
   };
 
   return (
-      <SafeAreaProvider>
-        <LoginScreen />
-      </SafeAreaProvider>
+    <SafeAreaProvider>
+      <LoginScreen />
+    </SafeAreaProvider>
   );
 }
 
