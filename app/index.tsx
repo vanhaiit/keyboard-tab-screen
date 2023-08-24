@@ -1,11 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable radix */
+/* eslint-disable react-native/no-inline-styles */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useRef, useState} from 'react';
 import {
-  FlatList,
   Keyboard,
-  SafeAreaView,
+  Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -15,151 +16,82 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
-// https://docs.swmansion.com/react-native-reanimated/docs/api/hooks/useAnimatedStyle/
-
-const ImageList = () => {
-  // Mô phỏng danh sách các ảnh
-  const imageList = [
-    {id: '1', source: 'https://example.com/image1.jpg'},
-    {id: '2', source: 'https://example.com/image2.jpg'},
-    {id: '3', source: 'https://example.com/image2.jpg'},
-    {id: '4', source: 'https://example.com/image2.jpg'},
-    {id: '5', source: 'https://example.com/image2.jpg'},
-    {id: '6', source: 'https://example.com/image2.jpg'},
-    // Thêm các ảnh khác vào đây...
-  ];
-
-  return (
-    <View style={styles.imageListContainer}>
-      {imageList.map(image => (
-        <TouchableOpacity key={image.id} style={styles.imageItem}>
-          {/* Hiển thị ảnh tại đây */}
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-};
-
+let h: number = 0;
 function App() {
   const keyboard = useAnimatedKeyboard();
   const insets = useSafeAreaInsets();
   const [showImage, setShowImage] = useState(false);
-  const [showEmoji, setShowEmoji] = useState(false);
   const [inputText, setInputText] = useState('');
-  const [chatData, setChatData] = useState<any>([]);
-  const [heightKeyBoard, setHeightKeyBoard] = useState(0);
+  const [active, setActive] = useState(false);
   const isKeyBoardRef = useRef(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      event => {
-        if (isKeyBoardRef.current) {
-          setShowImage(false);
-          setShowEmoji(false);
-        }
-        setHeightKeyBoard(event.endCoordinates.height);
-      },
-    );
-
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      event => {},
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    async function getHeightKeyBoard() {
-      const _heightKeyBoard =
-        (await AsyncStorage.getItem('heightKeyBoard')) || '300';
-      setHeightKeyBoard(parseInt(_heightKeyBoard));
-    }
-    getHeightKeyBoard().then();
-  }, []);
-
-  const handleEmojiPickerPress = () => {
-    // Implement the logic to open the emoji picker here
-    // You can use libraries like 'react-native-emoji-picker' for this purpose
-    setShowEmoji(!showEmoji);
-    setShowImage(false);
-    Keyboard.dismiss();
-  };
-
-  const handleImagePickerPress = () => {
-    // Implement the logic to open the image picker here
-    // You can use libraries like 'react-native-image-picker' for this purpose
-    // setShowImage(true);
-    setShowImage(!showImage);
-    setShowEmoji(false);
-    Keyboard.dismiss();
-  };
-
-  const handleSendPress = () => {
-    if (inputText.trim() !== '') {
-      setChatData((pre: any) => [
-        {id: Date.now(), message: inputText.trim()},
-        ...pre,
-      ]);
-      setInputText('');
-    }
-  };
-
   const translateStyle = useAnimatedStyle(() => {
-    console.log(
-      'translateStyle',
-      keyboard.height.value,
-      keyboard.state.value,
-      showEmoji,
-      showImage,
-      insets.bottom,
-      heightKeyBoard,
-    );
-
-    if (showImage || showEmoji) {
+    if (active) {
       return {
-        height: heightKeyBoard - insets.bottom,
+        height: h - insets.bottom,
       };
     }
-
     return {
       height: keyboard.height.value - insets.bottom,
     };
   });
 
-  const onFocus = () => {
+  async function getHeightKeyBoard() {
+    h = Number(await AsyncStorage.getItem('heightKeyBoard'));
+  }
+
+  function handleKeyBoard(e: any) {
+    if (isKeyBoardRef.current) {
+      setShowImage(false);
+    }
+    if (h) {
+      h = e.endCoordinates.height;
+    }
+    AsyncStorage.setItem('heightKeyBoard', e.endCoordinates.height.toString());
+  }
+
+  function handleImagePickerPress() {
+    setActive(true);
+    // Implement the logic to open the image picker here
+    // You can use libraries like 'react-native-image-picker' for this purpose
+    setShowImage(!showImage);
+    Keyboard.dismiss();
+  }
+
+  function handleFocusMain() {
+    setActive(false);
+    setShowImage(false);
+    Keyboard.dismiss();
+  }
+
+  function onFocus() {
     if (!isKeyBoardRef.current) {
       setShowImage(false);
-      setShowEmoji(false);
     }
     isKeyBoardRef.current = true;
-  };
+  }
 
-  const renderChatItem = ({item}: any) => (
-    <TouchableOpacity style={styles.messageContainer}>
-      <View style={styles.messageBubble}>
-        <Text style={styles.messageText}>{item.message}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      handleKeyBoard,
+    );
+    return () => keyboardDidShowListener.remove();
+  }, []);
+
+  useEffect(() => {
+    getHeightKeyBoard();
+  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Trò chuyện</Text>
-      <FlatList
-        data={chatData}
-        renderItem={renderChatItem}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.chatContainer}
-        // keyboardDismissMode={'on-drag'}
-        // keyboardShouldPersistTaps={'handle'}
-        inverted // To display the chat messages from bottom to top
-      />
+    <View
+      style={{
+        ...styles.container,
+        paddingBottom: insets.bottom,
+        paddingTop: insets.top,
+      }}>
+      <Pressable style={styles.chatContainer} onPress={handleFocusMain}>
+        <View />
+      </Pressable>
       <View
         style={{
           flexDirection: 'row',
@@ -167,19 +99,6 @@ function App() {
           padding: 10,
           backgroundColor: '#f0f0f0',
         }}>
-        <TouchableOpacity
-          onPress={handleEmojiPickerPress}
-          style={{marginRight: 12}}>
-          {/*<Image source={require('./path_to_emoji_icon.png')} style={{ width: 24, height: 24 }} />*/}
-          <View
-            style={{
-              width: 24,
-              height: 24,
-              backgroundColor: 'red',
-              borderRadius: 12,
-            }}
-          />
-        </TouchableOpacity>
         <TouchableOpacity onPress={handleImagePickerPress}>
           <View
             style={{
@@ -189,7 +108,6 @@ function App() {
               borderRadius: 12,
             }}
           />
-          {/*<Image source={require('./path_to_image_icon.png')} style={{ width: 24, height: 24 }} />*/}
         </TouchableOpacity>
         <TextInput
           style={{
@@ -204,7 +122,7 @@ function App() {
           onFocus={onFocus}
           // onBlur={onBlur}
         />
-        <TouchableOpacity onPress={handleSendPress}>
+        <TouchableOpacity>
           <View
             style={{
               width: 24,
@@ -213,14 +131,12 @@ function App() {
               borderRadius: 12,
             }}
           />
-          {/*<Image source={require('./path_to_send_icon.png')} style={{ width: 24, height: 24 }} />*/}
         </TouchableOpacity>
       </View>
       <Animated.View style={translateStyle}>
-        {showImage && <ImageList />}
-        {showEmoji && <View style={{flex: 1, backgroundColor: 'blue'}} />}
+        <View style={{flex: 1, backgroundColor: 'red'}} />
       </Animated.View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -290,7 +206,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingHorizontal: 16,
     paddingBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: 'pink',
   },
   messageContainer: {
     alignSelf: 'flex-start',
@@ -307,3 +223,41 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+// import React from 'react';
+// import {Text, View, StyleSheet} from 'react-native';
+// import normalize from 'react-native-normalize';
+
+// export default class App extends React.Component {
+//   render() {
+//     return (
+//       <View style={styles.container}>
+//         <View style={styles.box}>
+//           <Text style={styles.text}>React Native Normalize</Text>
+//         </View>
+//       </View>
+//     );
+//   }
+// }
+
+// console.log(normalize(20));
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//   },
+//   box: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     top: normalize(180, 'height'),
+//     left: normalize(40),
+//     width: normalize(300),
+//     height: normalize(300),
+//     borderRadius: normalize(150),
+//     backgroundColor: '#009fcd',
+//   },
+//   text: {
+//     fontSize: normalize(20),
+//     color: 'white',
+//   },
+// });
