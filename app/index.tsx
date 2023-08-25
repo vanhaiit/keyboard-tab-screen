@@ -14,58 +14,55 @@ import {
 import Animated, {
   useAnimatedKeyboard,
   useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-let h: number = 0;
+let heightTab: number = 0;
 function App() {
   const keyboard = useAnimatedKeyboard();
   const insets = useSafeAreaInsets();
-  const [showImage, setShowImage] = useState(false);
+  const offset = useSharedValue(0);
+  const [tab, setTab] = useState<number | string | undefined>();
   const [inputText, setInputText] = useState('');
-  const [active, setActive] = useState(false);
   const isKeyBoardRef = useRef(false);
   const translateStyle = useAnimatedStyle(() => {
-    if (active) {
-      return {
-        height: h - insets.bottom,
-      };
-    }
     return {
-      height: keyboard.height.value - insets.bottom,
+      height: (offset.value || keyboard.height.value) - insets.bottom,
     };
   });
 
-  async function getHeightKeyBoard() {
-    h = Number(await AsyncStorage.getItem('heightKeyBoard'));
-  }
-
   function handleKeyBoard(e: any) {
     if (isKeyBoardRef.current) {
-      setShowImage(false);
+      setTab(undefined);
     }
-    if (h) {
-      h = e.endCoordinates.height;
+    if (heightTab) {
+      heightTab = e.endCoordinates.height;
     }
     AsyncStorage.setItem('heightKeyBoard', e.endCoordinates.height.toString());
   }
 
-  function handleImagePickerPress() {
-    setActive(true);
+  function handleImagePickerPress(value: number) {
     // Implement the logic to open the image picker here
     // You can use libraries like 'react-native-image-picker' for this purpose
-    setShowImage(!showImage);
+    console.log(1111);
+
+    setTab(() => {
+      offset.value = withTiming(heightTab, {duration: 250});
+      return value;
+    });
     Keyboard.dismiss();
   }
 
   function handleFocusMain() {
-    setActive(false);
-    setShowImage(false);
+    offset.value = withTiming(0, {duration: 250});
+    setTab(undefined);
     Keyboard.dismiss();
   }
 
-  function onFocus() {
+  function onFocusInput() {
     if (!isKeyBoardRef.current) {
-      setShowImage(false);
+      setTab(undefined);
     }
     isKeyBoardRef.current = true;
   }
@@ -79,7 +76,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    getHeightKeyBoard();
+    (async () => {
+      heightTab = Number(await AsyncStorage.getItem('heightKeyBoard'));
+    })();
   }, []);
 
   return (
@@ -99,16 +98,11 @@ function App() {
           padding: 10,
           backgroundColor: '#f0f0f0',
         }}>
-        <TouchableOpacity onPress={handleImagePickerPress}>
-          <View
-            style={{
-              width: 24,
-              height: 24,
-              backgroundColor: 'green',
-              borderRadius: 12,
-            }}
-          />
-        </TouchableOpacity>
+        {data.map((e, index) => (
+          <Pressable onPress={() => handleImagePickerPress(e.key)} key={index}>
+            {e.label}
+          </Pressable>
+        ))}
         <TextInput
           style={{
             flex: 1,
@@ -119,7 +113,7 @@ function App() {
           placeholder="Type a message..."
           value={inputText}
           onChangeText={setInputText}
-          onFocus={onFocus}
+          onFocus={onFocusInput}
           // onBlur={onBlur}
         />
         <TouchableOpacity>
@@ -134,7 +128,13 @@ function App() {
         </TouchableOpacity>
       </View>
       <Animated.View style={translateStyle}>
-        <View style={{flex: 1, backgroundColor: 'red'}} />
+        {data.map((e, index) =>
+          tab === e.key ? (
+            <View style={{flex: 1}} key={index}>
+              {e.children}
+            </View>
+          ) : null,
+        )}
       </Animated.View>
     </View>
   );
@@ -221,6 +221,51 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+export const data = [
+  {
+    key: 1,
+    label: (
+      <View
+        style={{
+          width: 24,
+          height: 24,
+          backgroundColor: 'green',
+          borderRadius: 12,
+        }}
+      />
+    ),
+    children: <View style={{flex: 1, backgroundColor: 'green'}} />,
+  },
+  {
+    key: 2,
+    label: (
+      <View
+        style={{
+          width: 24,
+          height: 24,
+          backgroundColor: 'red',
+          borderRadius: 12,
+        }}
+      />
+    ),
+    children: <View style={{flex: 1, backgroundColor: 'red'}} />,
+  },
+  {
+    key: 3,
+    label: (
+      <View
+        style={{
+          width: 24,
+          height: 24,
+          backgroundColor: 'blue',
+          borderRadius: 12,
+        }}
+      />
+    ),
+    children: <View style={{flex: 1, backgroundColor: 'blue'}} />,
+  },
+];
 
 export default App;
 
