@@ -23,7 +23,7 @@ function App() {
   const keyboard = useAnimatedKeyboard();
   const insets = useSafeAreaInsets();
   const offset = useSharedValue(0);
-  const [tab, setTab] = useState<number | string | undefined>();
+  const [tab, setTab] = useState<number | string | null | undefined>();
   const [inputText, setInputText] = useState('');
   const isKeyBoardRef = useRef(false);
   const translateStyle = useAnimatedStyle(() => {
@@ -34,7 +34,7 @@ function App() {
 
   function handleKeyBoard(e: any) {
     if (isKeyBoardRef.current) {
-      setTab(undefined);
+      setTab(null);
     }
     if (heightTab) {
       heightTab = e.endCoordinates.height;
@@ -45,13 +45,12 @@ function App() {
   function handleImagePickerPress(value: number) {
     // Implement the logic to open the image picker here
     // You can use libraries like 'react-native-image-picker' for this purpose
-    console.log(1111);
-
+    offset.value =
+      tab === undefined ? withTiming(heightTab, {duration: 250}) : heightTab;
     setTab(() => {
-      offset.value = withTiming(heightTab, {duration: 250});
+      Keyboard.dismiss();
       return value;
     });
-    Keyboard.dismiss();
   }
 
   function handleFocusMain() {
@@ -62,7 +61,7 @@ function App() {
 
   function onFocusInput() {
     if (!isKeyBoardRef.current) {
-      setTab(undefined);
+      setTab(null);
     }
     isKeyBoardRef.current = true;
   }
