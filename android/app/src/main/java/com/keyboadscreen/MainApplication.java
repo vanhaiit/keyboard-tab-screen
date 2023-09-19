@@ -1,4 +1,4 @@
-package com.myproject;
+package com.keyboadscreen;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

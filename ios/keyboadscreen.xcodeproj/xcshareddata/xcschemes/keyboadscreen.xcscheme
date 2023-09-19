@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MyProject.app"
-               BlueprintName = "MyProject"
-               ReferencedContainer = "container:MyProject.xcodeproj">
+               BuildableName = "keyboadscreen.app"
+               BlueprintName = "keyboadscreen"
+               ReferencedContainer = "container:keyboadscreen.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MyProjectTests.xctest"
-               BlueprintName = "MyProjectTests"
-               ReferencedContainer = "container:MyProject.xcodeproj">
+               BuildableName = "keyboadscreenTests.xctest"
+               BlueprintName = "keyboadscreenTests"
+               ReferencedContainer = "container:keyboadscreen.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MyProject.app"
-            BlueprintName = "MyProject"
-            ReferencedContainer = "container:MyProject.xcodeproj">
+            BuildableName = "keyboadscreen.app"
+            BlueprintName = "keyboadscreen"
+            ReferencedContainer = "container:keyboadscreen.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MyProject.app"
-            BlueprintName = "MyProject"
-            ReferencedContainer = "container:MyProject.xcodeproj">
+            BuildableName = "keyboadscreen.app"
+            BlueprintName = "keyboadscreen"
+            ReferencedContainer = "container:keyboadscreen.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
