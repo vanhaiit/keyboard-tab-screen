@@ -6,15 +6,16 @@ import {
   fetchBaseQuery,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
-import { Mutex } from 'async-mutex';
-import { RootState } from './type';
+import {Mutex} from 'async-mutex';
+import {RootState} from './type';
 
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
   baseUrl: Config.BASE_URL,
-  prepareHeaders: (headers, { getState, endpoint }) => {
-    const token = (getState() as RootState).auth.accessToken;
+  prepareHeaders: (headers, {getState, endpoint}) => {
+    // const token = (getState() as RootState).auth.accessToken;
+    const token = 1;
 
     if (!!token && endpoint !== 'refresh') {
       headers.set('Authorization', `Bearer ${token}`);
