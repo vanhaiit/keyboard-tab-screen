@@ -1,39 +1,33 @@
-import { authReducer } from '@/features/auth/slice/authSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import { setupListeners } from '@reduxjs/toolkit/query';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import { persistReducer, persistStore } from 'redux-persist'
+import { setupListeners } from '@reduxjs/toolkit/query'
 
-import { baseQueryApi } from './baseQueryApi';
-import { postReducer } from '@/features/post/slice';
-import { searchReducer } from '@/features/search/slice';
+import { baseQueryApi } from './baseQueryApi'
 
 const persistConfig = {
-  key: 'root',
-  version: 1,
-  storage: AsyncStorage,
-  whitelist: ['auth', 'search'],
-};
+    key: 'root',
+    version: 1,
+    storage: AsyncStorage,
+    whitelist: ['auth', 'search'],
+}
 const rootReducer = combineReducers({
-  [baseQueryApi.reducerPath]: baseQueryApi.reducer,
-  auth: authReducer,
-  search: searchReducer,
-  post: postReducer,
-});
+    [baseQueryApi.reducerPath]: baseQueryApi.reducer,
+})
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 const store = configureStore({
-  reducer: persistedReducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }).concat(baseQueryApi.middleware),
-});
+    reducer: persistedReducer,
+    middleware: getDefaultMiddleware =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        }).concat(baseQueryApi.middleware),
+})
 
 // // configure listeners using the provided defaults
-setupListeners(store.dispatch);
+setupListeners(store.dispatch)
 
-const persistor = persistStore(store);
+const persistor = persistStore(store)
 
-export { store, persistor };
+export { store, persistor }
