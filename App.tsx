@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -6,83 +5,26 @@
  * @format
  */
 
-import React from 'react';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import TabScreenKeyboard from 'react-native-tabs-screen-keyboard';
-import {View} from 'react-native';
+import { NavigationRouter } from '@/navigations'
+import { persistor, store } from '@/store'
+import { theme } from '@/theme'
+import { ThemeProvider } from '@emotion/react'
+import { StyleSheet, View } from 'react-native'
 
-const _prefix = [
-  {
-    key: 1,
-    component: (
-      <View
-        style={{
-          width: 24,
-          height: 24,
-          backgroundColor: 'red',
-        }}
-      />
-    ),
-  },
-  {
-    key: 2,
-    component: (
-      <View
-        style={{
-          width: 24,
-          height: 24,
-          backgroundColor: 'green',
-        }}
-      />
-    ),
-  },
-  {
-    key: 3,
-    component: (
-      <View
-        style={{
-          width: 24,
-          height: 24,
-          backgroundColor: 'blue',
-        }}
-      />
-    ),
-  },
-];
-const _suffix = [
-  {
-    key: 1,
-    component: (
-      <View
-        style={{
-          width: 24,
-          height: 24,
-          backgroundColor: 'orange',
-        }}
-      />
-    ),
-  },
-];
-const _screens = [
-  {
-    key: 1,
-    component: <View style={{flex: 1, backgroundColor: 'red'}} />,
-  },
-  {
-    key: 2,
-    component: <View style={{flex: 1, backgroundColor: 'blue'}} />,
-  },
-  {
-    key: 3,
-    component: <View style={{flex: 1, backgroundColor: 'green'}} />,
-  },
-];
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 
 function App(): JSX.Element {
-  return (
-    <SafeAreaProvider>
-      <TabScreenKeyboard screens={_screens} suffix={_suffix} prefix={_prefix} />
-    </SafeAreaProvider>
-  );
+    return (
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <ThemeProvider theme={theme}>
+                    <NavigationRouter />
+                    <View />
+                </ThemeProvider>
+            </PersistGate>
+        </Provider>
+    )
 }
-export default App;
+
+export default App

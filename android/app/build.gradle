@@ -73,9 +73,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.keyboadscreen"
+    namespace "com.walletapp"
     defaultConfig {
-        applicationId "com.keyboadscreen"
+        applicationId "com.walletapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
